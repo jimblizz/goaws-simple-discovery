@@ -1,5 +1,4 @@
 package godisco
-import "fmt"
 
 type Godisco struct {}
 
