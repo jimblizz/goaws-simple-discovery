@@ -37,8 +37,6 @@ func (gd *Godisco) GetIPs(service string) (ips []string, err error) {
 	resp, ec2err := svc.DescribeInstances(params)
 
 	if ec2err != nil {
-		// Print the error, cast err to awserr.Error to get the Code and
-		// Message from an error.
 		err = ec2err
 		return
 	}
@@ -53,7 +51,6 @@ func (gd *Godisco) GetIPs(service string) (ips []string, err error) {
 		err = errors.New("Not IPs found for this service")
 	}
 
-	// Container to hold the result and unmarshal the content
 	return
 }
 
