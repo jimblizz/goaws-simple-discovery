@@ -1,4 +1,5 @@
 package godisco
+import "fmt"
 
 type Godisco struct {}
 
@@ -10,7 +11,7 @@ func (gd *Godisco) Get(service string) (ips []string, err error) {
 func (gd *Godisco) GetFirst(service string) (ip string, err error) {
 	ips, ipsErr := gd.Get(service)
 
-	if len(ips) > 0 && ipsErr != nil {
+	if ipsErr != nil {
 		ip = ips[0]
 	} else {
 		err = ipsErr
