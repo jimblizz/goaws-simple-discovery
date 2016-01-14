@@ -48,7 +48,7 @@ func (gd *Godisco) GetIPs(service string) (ips []string, err error) {
 	}
 
 	if len(ips) == 0 {
-		err = errors.New("Not IPs found for this service")
+		err = errors.New("No IPs found for the service " + service)
 	}
 
 	return
