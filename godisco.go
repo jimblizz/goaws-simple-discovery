@@ -1,19 +1,69 @@
 package godisco
 
+import (
+	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/service/ec2"
+	"errors"
+)
+
 type Godisco struct {}
 
-func (gd *Godisco) Get(service string) (ips []string, err error) {
-	ips = append(ips, "10.10.10.9")
+var tagKey = "Service"
+var region = "eu-west-1"
+
+func (gd *Godisco) SetTagKey(newTagKey string) {
+	tagKey = newTagKey
+}
+
+func (gd *Godisco) SetRegion(newRegion string) {
+	region = newRegion
+}
+
+func (gd *Godisco) GetIPs(service string) (ips []string, err error) {
+
+	svc := ec2.New(session.New(), aws.NewConfig().WithRegion(region))
+
+	params := &ec2.DescribeInstancesInput{
+		Filters: []*ec2.Filter{
+			{
+				Name: aws.String("tag:" + tagKey),
+				Values: []*string{
+					aws.String(service),
+				},
+			},
+		},
+	}
+	resp, ec2err := svc.DescribeInstances(params)
+
+	if ec2err != nil {
+		// Print the error, cast err to awserr.Error to get the Code and
+		// Message from an error.
+		err = ec2err
+		return
+	}
+
+	for _, reservation := range resp.Reservations {
+		for _, instance := range reservation.Instances {
+			ips = append(ips, *instance.PrivateIpAddress)
+		}
+	}
+
+	if len(ips) == 0 {
+		err = errors.New("Not IPs found for this service")
+	}
+
+	// Container to hold the result and unmarshal the content
 	return
 }
 
-func (gd *Godisco) GetFirst(service string) (ip string, err error) {
-	ips, ipsErr := gd.Get(service)
+func (gd *Godisco) GetFirstIp(service string) (ip string, err error) {
+	ips, ipsErr := gd.GetIPs(service)
 
 	if ipsErr != nil {
-		ip = ips[0]
-	} else {
 		err = ipsErr
+	} else {
+		ip = ips[0]
 	}
 	return
 }
