@@ -43,7 +43,9 @@ func (gd *Godisco) GetIPs(service string) (ips []string, err error) {
 
 	for _, reservation := range resp.Reservations {
 		for _, instance := range reservation.Instances {
-			ips = append(ips, *instance.PrivateIpAddress)
+			if *instance.State.Name == "running" {
+				ips = append(ips, *instance.PrivateIpAddress)
+			}
 		}
 	}
 
